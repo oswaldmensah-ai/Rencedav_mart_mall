@@ -1,0 +1,62 @@
+{% extends 'base.html' %} {% block title %}Order #{{ order.id }} — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="max-w-5xl mx-auto p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-bold">Order #{{ order.id }}</h1>
+                <p class="text-sm text-stone-500">Placed {{ order.created_at|date:'M j, Y' }}</p>
+            </div>
+            <div class="space-y-1 text-right">
+                <p class="font-semibold">Status: {{ order.status }}</p>
+                <p class="font-semibold">Total: GH₵ {{ order.total_amount }}</p>
+            </div>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] mb-8">
+            <section class="rounded-3xl border border-stone-200 p-6 bg-cream">
+                <h2 class="text-xl font-semibold mb-4">Order details</h2>
+                <p class="mb-2"><strong>Name:</strong> {{ order.full_name }}</p>
+                <p class="mb-2"><strong>Email:</strong> {{ order.email|default:'(not provided)' }}</p>
+                <p class="mb-2"><strong>Phone:</strong> {{ order.phone_number }}</p>
+                <p class="mb-2"><strong>Fulfillment:</strong> {{ order.get_fulfillment_type_display }}</p>
+                {% if order.fulfillment_type == 'delivery' %}
+                <p class="mb-2"><strong>Distance:</strong> {{ order.delivery_distance_km }} km</p>
+                <p class="mb-2"><strong>Address:</strong></p>
+                <p class="text-sm text-stone-600 whitespace-pre-line">{{ order.delivery_address }}</p>
+                {% endif %}
+            </section>
+
+            <section class="rounded-3xl border border-stone-200 p-6 bg-cream">
+                <h2 class="text-xl font-semibold mb-4">Payment summary</h2>
+                <div class="space-y-2 text-sm text-stone-700">
+                    <div class="flex justify-between"><span>Subtotal</span><span>GH₵ {{ subtotal }}</span></div>
+                    {% if order.fulfillment_type == 'delivery' %}
+                    <div class="flex justify-between"><span>Delivery fee ({{ order.delivery_distance_km }} km)</span><span>GH₵ {{ order.get_delivery_fee }}</span></div>
+                    {% endif %}
+                    <div class="border-t border-stone-300 pt-3 flex justify-between font-semibold"><span>Total</span><span>GH₵ {{ order.total_amount }}</span></div>
+                </div>
+            </section>
+        </div>
+
+        <section class="rounded-3xl border border-stone-200 p-6">
+            <h2 class="text-xl font-semibold mb-4">Items</h2>
+            <div class="space-y-3">
+                {% for item in order.items.all %}
+                <div class="grid gap-4 sm:grid-cols-[1fr_auto_auto] items-center rounded-2xl border border-stone-200 p-4">
+                    <div>
+                        <p class="font-semibold">{{ item.product.name }}</p>
+                        <p class="text-sm text-stone-500">{{ item.quantity }} × GH₵ {{ item.price }}</p>
+                    </div>
+                    <p class="text-sm text-stone-700 text-right">GH₵ {{ item.get_cost }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="mt-8 flex justify-between items-center">
+            <a href="{% url 'accounts:order_history' %}" class="text-emerald-600 hover:text-emerald-700">Back to order history</a>
+            <a href="{% url 'accounts:profile' %}" class="text-stone-600 hover:text-stone-800">Back to profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

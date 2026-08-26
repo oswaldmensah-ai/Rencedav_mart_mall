@@ -1,0 +1,50 @@
+{% extends 'base.html' %} {% block title %}Order History — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="max-w-5xl mx-auto p-4 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+    <section class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-bold">Order History</h1>
+                <p class="text-sm text-stone-500 mt-1">All orders placed with your account.</p>
+            </div>
+            <a href="{% url 'accounts:profile' %}" class="text-emerald-600 hover:text-emerald-700">Back to profile</a>
+        </div>
+
+        {% if orders %}
+        <div class="space-y-4">
+            {% for order in orders %}
+            <a href="{% url 'accounts:order_detail' order.id %}" class="block rounded-3xl border border-stone-200 p-5 hover:border-emerald-500 transition">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <p class="font-semibold">Order #{{ order.id }}</p>
+                        <p class="text-sm text-stone-500">Placed {{ order.created_at|date:'M j, Y' }}</p>
+                    </div>
+                    <div class="space-y-1 text-right">
+                        <p class="text-sm">Status: <span class="font-semibold">{{ order.status }}</span></p>
+                        <p class="text-sm">Total: GH₵ {{ order.total_amount }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <div class="mt-6 flex items-center justify-center gap-3">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded border">Previous</a> {% else %}
+            <span class="px-3 py-1 rounded border text-stone-400">Previous</span> {% endif %}
+
+            <span class="px-3 py-1">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span> {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded border">Next</a> {% else %}
+            <span class="px-3 py-1 rounded border text-stone-400">Next</span> {% endif %}
+        </div>
+        {% endif %} {% else %}
+        <p class="text-stone-500">You have not placed any orders yet.</p>
+        {% endif %}
+    </section>
+
+    <aside class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <h2 class="text-xl font-semibold mb-4">Order tips</h2>
+        <p class="text-sm text-stone-500 leading-relaxed">Click an order to view details, payment status, delivery address, and order items.</p>
+    </aside>
+</div>
+{% endblock %}

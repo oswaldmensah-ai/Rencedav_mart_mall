@@ -1,0 +1,86 @@
+{% extends 'base.html' %} {% block title %}Dashboard — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto p-4 space-y-6">
+    <div>
+        <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+        <p class="text-stone-500 mt-1">Manage the catalogue and keep an eye on new orders.</p>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section class="order-2 bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
+            <h2 class="font-semibold text-xl mb-5">Add category</h2>
+            <form method="post" action="{% url 'dashboard:add_category' %}" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                {{ category_form.non_field_errors }}
+                {% for field in category_form %}
+                <div>
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                    <label class="flex items-center gap-2 text-sm font-medium">{{ field }} {{ field.label }}</label>
+                    {% else %}
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-stone-700 mb-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% endif %}
+                    {% for error in field.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="w-full rounded-lg bg-emerald-600 text-white font-semibold py-3 hover:bg-emerald-700 transition-colors">Add category</button>
+            </form>
+        </section>
+
+        <section class="order-first lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
+            <div class="flex items-center justify-between gap-4 mb-5">
+                <h2 class="font-semibold text-xl">Recent orders</h2>
+                <span class="text-sm text-stone-500">Latest 10</span>
+            </div>
+            <div class="space-y-3">
+                {% for order in orders %}
+                <details class="rounded-xl border border-stone-200 p-4">
+                    <summary class="cursor-pointer list-none flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <span><strong>Order #{{ order.id }}</strong> · {{ order.full_name }}</span>
+                        <span class="text-sm text-stone-500">{{ order.created_at|date:'M j, Y g:i A' }} · {{ order.status }} · GH₵ {{ order.total_amount }}</span>
+                    </summary>
+                    <div class="mt-3 pt-3 border-t border-stone-100 text-sm text-stone-600 space-y-1">
+                        <p>{{ order.email|default:'No email provided' }} · {{ order.phone_number }}</p>
+                        <p>{{ order.get_fulfillment_type_display }}{% if order.delivery_address %} · {{ order.delivery_address }}{% endif %}</p>
+                        <ul class="list-disc pl-5">
+                            {% for item in order.items.all %}
+                            <li>{{ item.quantity }} × {{ item.product.name }} at GH₵ {{ item.price }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if order.needs_review %}
+                        <form method="post" action="{% url 'dashboard:review_order' order.id %}" class="pt-2">
+                            {% csrf_token %}
+                            <button type="submit" class="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Mark reviewed</button>
+                        </form>
+                        {% else %}
+                        <p class="pt-2 text-xs font-semibold text-emerald-700">Reviewed</p>
+                        {% endif %}
+                    </div>
+                </details>
+                {% empty %}
+                <p class="text-stone-500">No orders have been placed yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="order-3 bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
+            <h2 class="font-semibold text-xl mb-5">Add product</h2>
+            <form method="post" action="{% url 'dashboard:add_product' %}" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                {{ product_form.non_field_errors }}
+                {% for field in product_form %}
+                <div>
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                    <label class="flex items-center gap-2 text-sm font-medium">{{ field }} {{ field.label }}</label>
+                    {% else %}
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-stone-700 mb-1">{{ field.label }}</label>
+                    {{ field }}
+                    {% endif %}
+                    {% for error in field.errors %}<p class="text-sm text-red-600 mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="w-full rounded-lg bg-emerald-600 text-white font-semibold py-3 hover:bg-emerald-700 transition-colors">Add product</button>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}

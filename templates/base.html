@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Premium organic groceries and more, delivered fresh.{% endblock %}" /> {% load static %}
+
+    <!-- Tailwind CSS utilities for the page templates -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Brand Tokens & Global Styles -->
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}" />
+
+    <!-- Favicon placeholder -->
+    <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml" /> {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- ── Navigation ───────────────────────────────────────────────────── -->
+    {% include 'partials/navbar.html' %}
+
+    <!-- ── Flash Messages ───────────────────────────────────────────────── -->
+    {% if messages %}
+    <div class="messages-container" style="
+    position: fixed; top: calc(var(--nav-height) + 12px); right: 20px;
+    z-index: 9999; display: flex; flex-direction: column; gap: 8px;
+    max-width: 380px; width: 100%;
+  ">
+        {% for message in messages %}
+        <div class="message message-{{ message.tags }}" style="
+      padding: 14px 18px; border-radius: var(--radius-md);
+      background: var(--cream); border: 1px solid var(--cream-border);
+      box-shadow: var(--shadow-md); font-size: 0.875rem;
+      display: flex; align-items: center; gap: 10px;
+      animation: slideIn 0.25s ease;
+    ">
+            {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+    {% endif %}
+
+    <!-- ── Main Content ─────────────────────────────────────────────────── -->
+    <main style="min-height: calc(100vh - var(--nav-height) - 320px);">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ── Footer ───────────────────────────────────────────────────────── -->
+    {% include 'partials/footer.html' %} {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

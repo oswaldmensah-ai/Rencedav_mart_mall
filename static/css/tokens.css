@@ -1,0 +1,335 @@
+/*
+  Rencedav Mart & More — Design Token System
+  ──────────────────────────────────────────
+  Import this file in base.html.
+  All components reference these variables — never hardcode colors.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap');
+:root {
+    /* ── Brand Palette ─────────────────────────────────────────────────────── */
+    --cream: #FAF7F2;
+    --cream-dark: #F0EBE1;
+    --cream-border: #E4DBCE;
+    --cream-deep: #DDD1C0;
+    --burgundy: #6B1A2A;
+    --burgundy-light: #8B2A3F;
+    --burgundy-hover: #7A1F32;
+    --burgundy-dark: #4A1019;
+    --burgundy-tint: #F5ECEE;
+    --burgundy-tint2: #EDD8DC;
+    /* ── Text ──────────────────────────────────────────────────────────────── */
+    --text-primary: #1C1410;
+    --text-secondary: #6B5C50;
+    --text-muted: #A89282;
+    --text-on-burgundy: #FAF7F2;
+    /* ── Semantic ───────────────────────────────────────────────────────────── */
+    --color-success: #2D6A4F;
+    --color-success-bg: #D8F3DC;
+    --color-warning: #805B00;
+    --color-warning-bg: #FFF3CD;
+    --color-danger: #842029;
+    --color-danger-bg: #F8D7DA;
+    --color-info: #084298;
+    --color-info-bg: #CFE2FF;
+    /* ── Typography ─────────────────────────────────────────────────────────── */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Poppins', system-ui, sans-serif;
+    --font-mono: 'Courier New', Courier, monospace;
+    /* ── Spacing Scale ───────────────────────────────────────────────────────── */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    /* ── Radii ───────────────────────────────────────────────────────────────── */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+    /* ── Shadows ─────────────────────────────────────────────────────────────── */
+    --shadow-sm: 0 1px 3px rgba(28, 20, 16, 0.08), 0 1px 2px rgba(28, 20, 16, 0.04);
+    --shadow-md: 0 4px 12px rgba(28, 20, 16, 0.10), 0 2px 4px rgba(28, 20, 16, 0.06);
+    --shadow-lg: 0 10px 30px rgba(28, 20, 16, 0.12), 0 4px 8px rgba(28, 20, 16, 0.06);
+    /* ── Transitions ─────────────────────────────────────────────────────────── */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 400ms ease;
+    /* ── Layout ──────────────────────────────────────────────────────────────── */
+    --max-width: 1280px;
+    --content-width: 1100px;
+    --nav-height: 64px;
+}
+
+
+/* ── Global Reset & Base ──────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--cream);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-display);
+    color: var(--text-primary);
+    line-height: 1.25;
+}
+
+a {
+    color: var(--burgundy);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--burgundy-light);
+}
+
+
+/* ── Utility: Container ──────────────────────────────────────────────────── */
+
+.container {
+    width: 100%;
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+
+/* ── Utility: Buttons ────────────────────────────────────────────────────── */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 12px 28px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 2px solid transparent;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var(--burgundy);
+    color: var(--text-on-burgundy);
+    border-color: var(--burgundy);
+}
+
+.btn-primary:hover {
+    background: var(--burgundy-hover);
+    border-color: var(--burgundy-hover);
+    color: var(--text-on-burgundy);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--burgundy);
+    border-color: var(--burgundy);
+}
+
+.btn-outline:hover {
+    background: var(--burgundy);
+    color: var(--text-on-burgundy);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.btn-ghost:hover {
+    background: var(--cream-dark);
+    color: var(--text-primary);
+}
+
+.btn-sm {
+    padding: 8px 18px;
+    font-size: 0.8125rem;
+}
+
+.btn-lg {
+    padding: 16px 36px;
+    font-size: 1rem;
+}
+
+
+/* ── Utility: Status Badges ──────────────────────────────────────────────── */
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.badge-success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.badge-warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.badge-danger {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.badge-info {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+}
+
+.badge-neutral {
+    background: var(--cream-dark);
+    color: var(--text-secondary);
+}
+
+
+/* ── Utility: Form Inputs ────────────────────────────────────────────────── */
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--cream);
+    border: 1.5px solid var(--cream-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--burgundy);
+    box-shadow: 0 0 0 3px var(--burgundy-tint);
+}
+
+
+/* ── Product Detail Section ───────────────────────────────────────────────── */
+
+.product-detail-section {
+    padding: var(--space-8) 0;
+}
+
+.product-detail-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 247, 242, 0.98) 100%);
+    border-radius: var(--radius-xl);
+}
+
+.product-detail-image {
+    background: var(--cream);
+    border: 1px solid var(--cream-border);
+}
+
+.product-detail-title {
+    letter-spacing: -0.03em;
+}
+
+.product-detail-price {
+    color: var(--burgundy);
+}
+
+.product-detail-description {
+    max-width: 40rem;
+}
+
+.product-detail-purchase {
+    padding-top: var(--space-5);
+}
+
+.product-buy-form {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.product-add-button {
+    border: none;
+}
+
+.quantity-field select {
+    width: auto;
+    min-width: 96px;
+}
+
+@media (max-width: 768px) {
+    .product-detail-card {
+        padding: var(--space-6);
+    }
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+
+/* ── Utility: Cards ──────────────────────────────────────────────────────── */
+
+.card {
+    background: var(--cream);
+    border: 1px solid var(--cream-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+
+/* ── Utility: Section spacing ────────────────────────────────────────────── */
+
+.section {
+    padding: var(--space-16) 0;
+}
+
+.section-sm {
+    padding: var(--space-10) 0;
+}

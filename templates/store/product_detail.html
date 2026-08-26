@@ -1,0 +1,122 @@
+{% extends 'base.html' %} {% block title %}{{ product.name }} — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="product-detail-section max-w-4xl mx-auto p-4 my-6">
+    <div class="product-detail-card grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-3xl shadow-lg border border-stone-200 overflow-hidden">
+
+        <div class="product-detail-image flex items-center justify-center rounded-3xl p-5">
+            <img src="{{ product.display_image }}" alt="{{ product.name }}" class="max-h-96 object-contain rounded-3xl shadow-sm">
+        </div>
+
+        <div class="product-detail-info flex flex-col justify-between">
+            <div class="product-detail-copy">
+                <span class="badge badge-neutral inline-flex text-xs font-bold uppercase tracking-wide px-3 py-2 rounded-full">
+                    {{ product.category.name }}
+                </span>
+                <h1 class="product-detail-title text-4xl md:text-5xl font-bold text-stone-900 mt-4 mb-5">{{ product.name }}</h1>
+                <p class="product-detail-price text-3xl md:text-4xl font-extrabold text-burgundy mb-5">GH₵ {{ product.price }}</p>
+                <p class="product-detail-description text-stone-600 text-base md:text-lg leading-relaxed mb-8">{{ product.description }}</p>
+            </div>
+
+            <div class="product-detail-purchase border-t border-stone-100 pt-6">
+                {% if product.is_in_stock %}
+                <p class="product-stock text-sm font-medium text-success flex items-center mb-4">
+                    <span class="w-2.5 h-2.5 rounded-full bg-success inline-block mr-2 animate-pulse"></span> In Stock ({{ product.stock_quantity }} items left)
+                </p>
+
+                <form action="{% url 'cart:cart_add' product.id %}" method="post" class="product-buy-form space-y-4" id="add-to-cart-form">
+                    {% csrf_token %}
+                    <div class="quantity-field flex items-center gap-3">
+                        <label for="quantity" class="text-sm font-semibold text-stone-700">Quantity:</label>
+                        <select name="quantity" id="quantity" class="form-input rounded-xl border-stone-300 bg-cream text-sm py-2 px-4 focus:ring-emerald-500 focus:border-emerald-500">
+                            {% for qty in quantity_options %}
+                                <option value="{{ qty }}">{{ qty }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="product-add-button w-full rounded-2xl bg-emerald-600 text-white font-semibold py-4 shadow-md transition duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300">Add to Grocery Basket</button>
+                    <div id="add-to-cart-msg" class="text-sm text-emerald-700 mt-2 hidden"></div>
+                </form>
+                {% else %}
+                <p class="text-sm font-bold text-danger mb-2">Temporarily Out of Stock</p>
+                <button disabled class="w-full bg-cream text-stone-500 font-bold py-3 px-4 rounded-2xl border border-cream cursor-not-allowed">Out of Stock</button> {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('add-to-cart-form');
+        if (!form) return;
+        const msg = document.getElementById('add-to-cart-msg');
+        const btn = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = form.action;
+            const formData = new FormData(form);
+            const csrf = formData.get('csrfmiddlewaretoken');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrf,
+                    },
+                    body: formData,
+                })
+                .then(r => {
+                    const ct = r.headers.get('content-type') || '';
+                    if (ct.indexOf('application/json') !== -1) return r.json();
+                    // fallback: not JSON (likely a redirect fallback) — treat as failure
+                    return {
+                        success: false,
+                        error: 'non-json-response'
+                    };
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        // update cart count in navbar
+                        const cartCount = document.getElementById('cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.cart_count;
+                            cartCount.style.display = data.cart_count > 0 ? 'inline-flex' : 'none';
+                        }
+                        // show mini-cart popover if provided
+                        const mini = document.getElementById('mini-cart-pop');
+                        if (mini && data.mini_cart_html) {
+                            mini.innerHTML = data.mini_cart_html;
+                            mini.classList.remove('hidden');
+                            // auto-hide after 4 seconds
+                            setTimeout(() => mini.classList.add('hidden'), 4000);
+                        }
+                        if (msg) {
+                            msg.textContent = 'Added to basket';
+                            msg.classList.remove('hidden');
+                            setTimeout(() => msg.classList.add('hidden'), 2500);
+                        }
+                    } else {
+                        if (msg) {
+                            msg.textContent = data && data.error === 'non-json-response' ? 'Added (redirected). Reloading...' : 'Could not add to basket';
+                            msg.classList.remove('hidden');
+                        }
+                        // if server redirected (non-json), reload to reflect cart
+                        if (data && data.error === 'non-json-response') window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    if (msg) {
+                        msg.textContent = 'Network error';
+                        msg.classList.remove('hidden');
+                    }
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70');
+                });
+        });
+    });
+</script>
+{% endblock %}

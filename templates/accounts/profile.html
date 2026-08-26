@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block title %}Profile — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="max-w-3xl mx-auto p-4 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+    <section class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <h1 class="text-3xl font-bold mb-6">My Profile</h1>
+        <form method="post" novalidate class="space-y-4">
+            {% csrf_token %} {{ form.non_field_errors }}
+            <div>{{ form.first_name.label_tag }}{{ form.first_name }}{{ form.first_name.errors }}</div>
+            <div>{{ form.last_name.label_tag }}{{ form.last_name }}{{ form.last_name.errors }}</div>
+            <div>{{ form.phone_number.label_tag }}{{ form.phone_number }}{{ form.phone_number.errors }}</div>
+            <div>{{ form.address.label_tag }}{{ form.address }}{{ form.address.errors }}</div>
+            <button type="submit" class="mt-4 w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition-colors">
+        Save changes
+      </button>
+        </form>
+    </section>
+
+    <aside class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Recent orders</h2>
+            <a href="{% url 'accounts:order_history' %}" class="text-emerald-600 hover:text-emerald-700">View all</a>
+        </div>
+        {% if orders %}
+        <div class="space-y-3">
+            {% for order in orders %}
+            <a href="{% url 'accounts:order_detail' order.id %}" class="block rounded-2xl border border-stone-200 p-4 hover:border-emerald-500 transition">
+                <p class="font-semibold">Order #{{ order.id }}</p>
+                <p class="text-sm text-stone-500">Placed {{ order.created_at|date:'M j, Y' }}</p>
+                <p class="text-sm text-stone-500">Status: {{ order.status }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-stone-500">No recent orders yet.</p>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

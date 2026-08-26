@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block title %}Webhook Result — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="max-w-2xl mx-auto p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <h1 class="text-3xl font-bold mb-4">Webhook Processed</h1>
+        <p class="text-stone-600 mb-6">Simulated webhook for order <strong>#{{ order.id }}</strong> has been processed.</p>
+        <div class="rounded-2xl border border-stone-200 bg-stone-50 p-4 space-y-2">
+            <div class="flex justify-between">
+                <span class="text-sm text-stone-500">Payment reference</span>
+                <span class="font-semibold">{{ payment.paystack_reference }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-sm text-stone-500">Status</span>
+                <span class="font-semibold">{{ payment.status }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-sm text-stone-500">Amount</span>
+                <span class="font-semibold">GH₵ {{ payment.amount }}</span>
+            </div>
+        </div>
+        <a href="{% url 'orders:order_created' %}" class="mt-6 inline-block bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-emerald-700 transition-colors">View Order Confirmation</a>
+    </div>
+</div>
+{% endblock %}

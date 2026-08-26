@@ -1,0 +1,85 @@
+{% extends 'base.html' %} {% block title %}Pay for Order #{{ order.id }} — {{ SITE_NAME }}{% endblock %} {% block content %}
+<div class="max-w-3xl mx-auto p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-stone-200">
+        <h1 class="text-3xl font-bold mb-4">Complete payment</h1>
+        <p class="text-stone-600 mb-6">Order #{{ order.id }}: GH₵ {{ order.total_amount }}. Pay securely with Paystack.</p>
+
+        <div class="space-y-4">
+            <div class="rounded-2xl border border-stone-200 p-4 bg-stone-50">
+                <p class="text-sm text-stone-500">Name</p>
+                <p class="font-semibold">{{ order.full_name }}</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 p-4 bg-stone-50">
+                <p class="text-sm text-stone-500">Fulfillment method</p>
+                <p class="font-semibold">{{ order.get_fulfillment_type_display }}</p>
+            </div>
+            {% if order.fulfillment_type == 'delivery' %}
+            <div class="rounded-2xl border border-stone-200 p-4 bg-stone-50">
+                <p class="text-sm text-stone-500">Distance</p>
+                <p class="font-semibold">{{ order.delivery_distance_km }} km</p>
+            </div>
+            <div class="rounded-2xl border border-stone-200 p-4 bg-stone-50">
+                <p class="text-sm text-stone-500">Delivery address</p>
+                <p class="font-semibold">{{ order.delivery_address }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <button id="paystack-button" class="mt-8 w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition-colors">Pay GH₵ {{ order.total_amount }}</button>
+
+        <p class="text-xs text-stone-500 mt-4">You will be redirected to Paystack to complete the payment.</p>
+    </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    (function() {
+        const payButton = document.getElementById('paystack-button');
+        if (!payButton) return;
+
+        payButton.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            const handler = PaystackPop.setup({
+                key: '{{ paystack_public_key }}',
+                email: '{{ order.email|default_if_none:"" }}',
+                amount: Math.round(parseFloat('{{ order.total_amount }}') * 100),
+
+                currency: 'GHS',
+                ref: 'order_{{ order.id }}_' + Math.floor((Math.random() * 1000000000) + 1),
+                metadata: {
+                    order_id: '{{ order.id }}',
+                },
+                callback: function(response) {
+                    fetch('{% url "payments:payment_callback" %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({
+                                reference: response.reference,
+                                order_id: '{{ order.id }}'
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'ok') {
+                                window.location.href = '{% url "orders:order_created" %}';
+                            } else {
+                                alert('Payment verification failed. Please contact support.');
+                            }
+                        })
+                        .catch(() => {
+                            alert('Unable to verify payment right now. Please refresh and try again.');
+                        });
+                },
+                onClose: function() {
+                    alert('Payment window closed. Your order remains saved and pending.');
+                }
+            });
+            handler.openIframe();
+        });
+    })();
+</script>
+{% endblock %}
