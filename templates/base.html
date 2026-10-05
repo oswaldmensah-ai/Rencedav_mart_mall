@@ -9,6 +9,13 @@
 
     <!-- Tailwind CSS utilities for the page templates -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwindConfig = {
+            corePlugins: {
+                preflight: true,
+            }
+        }
+    </script>
 
     <!-- Brand Tokens & Global Styles -->
     <link rel="stylesheet" href="{% static 'css/tokens.css' %}" />
